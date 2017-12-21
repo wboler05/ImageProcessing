@@ -29,14 +29,16 @@ SOURCES += \
     imagecontainer.cpp \
     imagecontroller.cpp \
     imagewidget.cpp \
-    improc.cpp
+    improc.cpp \
+    customimage.cpp
 
 HEADERS += \
         mainwindow.h \
     imagecontainer.h \
     imagecontroller.h \
     imagewidget.h \
-    improc.h
+    improc.h \
+    customimage.h
 
 FORMS += \
         mainwindow.ui

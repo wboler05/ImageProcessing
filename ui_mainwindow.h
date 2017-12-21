@@ -275,7 +275,7 @@ public:
         actionLoad->setText(QApplication::translate("MainWindow", "Load...", Q_NULLPTR));
         actionExit->setText(QApplication::translate("MainWindow", "Exit", Q_NULLPTR));
         groupBox->setTitle(QApplication::translate("MainWindow", "Gaussian Box", Q_NULLPTR));
-        swag_btn->setText(QApplication::translate("MainWindow", "Swag", Q_NULLPTR));
+        swag_btn->setText(QApplication::translate("MainWindow", "Process", Q_NULLPTR));
         label->setText(QApplication::translate("MainWindow", "Kernel Size", Q_NULLPTR));
         label_2->setText(QApplication::translate("MainWindow", "Std Dev X", Q_NULLPTR));
         label_3->setText(QApplication::translate("MainWindow", "Std Dev Y", Q_NULLPTR));

@@ -44,7 +44,7 @@ void MainWindow::on_actionSave_triggered() {
 
 void MainWindow::on_actionLoad_triggered() {
     QDir curDir = qApp->applicationDirPath();
-    QString fileName = QFileDialog::getOpenFileName(this, "Open output image", curDir.absolutePath(), "Image File (*.png *.jpg *.gif)");
+    QString fileName = QFileDialog::getOpenFileName(this, "Open input image", curDir.absolutePath(), "Image File (*.png *.jpg *.gif);;All Files (*.*)");
 
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly)) {
@@ -58,7 +58,7 @@ void MainWindow::on_actionLoad_triggered() {
         qWarning() << "Failed to open file: " << fileName;
     } else {
         qDebug() << "Successfully opened file: " << fileName;
-        putSomeSwagOnThem();
+        processInputImage();
     }
 
 }
@@ -67,21 +67,23 @@ void MainWindow::on_actionExit_triggered() {
     exit(1);
 }
 
-void MainWindow::putSomeSwagOnThem() {
+void MainWindow::processInputImage() {
     if (ImageContainer::instance()->m_input_image.isNull()) return;
 
-    QImage inputImage = *ImageContainer::instance()->m_input_image.data();
-    QImage redImage = inputImage;
-    QImage greenImage = inputImage;
-    QImage blueImage = inputImage;
+    CustomImage inputImage = *ImageContainer::instance()->m_input_image.data();
+    QImage redImage(inputImage.size(), inputImage.format());
+    QImage greenImage(inputImage.size(), inputImage.format());
+    QImage blueImage(inputImage.size(), inputImage.format());
+    redImage.fill(QColor(0,0,0));
+    greenImage.fill(QColor(0,0,0));
+    blueImage.fill(QColor(0,0,0));
 
     for (size_t i = 0; i < inputImage.size().width(); i++) {
         for (size_t j = 0; j < inputImage.size().height(); j++) {
-            QColor inputColor = inputImage.pixelColor(i, j);
-            QColor redColor = inputColor, greenColor = inputColor, blueColor = inputColor;
-            redColor.setBlue(0);redColor.setGreen(0);
-            greenColor.setRed(0);greenColor.setBlue(0);
-            blueColor.setRed(0);blueColor.setGreen(0);
+            QColor redColor, greenColor, blueColor;
+            redColor.setRedF(inputImage.data()[i][j][0]);
+            greenColor.setGreenF(inputImage.data()[i][j][1]);
+            blueColor.setBlueF(inputImage.data()[i][j][2]);
 
             redImage.setPixelColor(i, j, redColor);
             greenImage.setPixelColor(i, j, greenColor);
@@ -89,25 +91,24 @@ void MainWindow::putSomeSwagOnThem() {
         }
     }
 
-    QImage outputImage;
-    //ImProc::gaussian(inputImage, outputImage, 3, 5, 5);
-    ImProc::DoG(inputImage, outputImage, m_kernel_size, m_std_dev_x, m_std_dev_y);
-    //ImProc::DoG(inputImage, outputImage, 5, 25, 5, 25, 5);
-    QImage grayScale;
-    //ImProc::grayscale(inputImage, grayScale);
-    //ImProc::gaussian(grayScale, outputImage, 3, 1, 1);
-    //ImProc::DoG(grayScale, outputImage, 7, 0.5, 0.5);
+    CustomImage outputImage;
+    CustomImage grayScale;
+    CustomImage normalImage;
+    ImProc::normalizeImage(inputImage, outputImage);
+    //ImProc::grayscale(normalImage, grayScale);
+    //ImProc::gaussian(normalImage, outputImage, m_kernel_size, m_std_dev_x, m_std_dev_y);
+    //ImProc::DoG(grayScale, outputImage, m_kernel_size, m_std_dev_x, m_std_dev_y);
 
     ImageContainer::instance()->m_red_image = QSharedPointer<QImage>(new QImage(redImage));
     ImageContainer::instance()->m_green_image = QSharedPointer<QImage>(new QImage(greenImage));
     ImageContainer::instance()->m_blue_image = QSharedPointer<QImage>(new QImage(blueImage));
-    ImageContainer::instance()->m_output_image = QSharedPointer<QImage>(new QImage(outputImage));
+    ImageContainer::instance()->m_output_image = QSharedPointer<QImage>(new QImage(outputImage.imageTransfer()));
 
-    ui->input_ogl->updateImage(inputImage);
+    ui->input_ogl->updateImage(inputImage.imageTransfer());
     ui->red_ogl->updateImage(redImage);
     ui->green_ogl->updateImage(greenImage);
     ui->blue_ogl->updateImage(blueImage);
-    ui->output_ogl->updateImage(outputImage);
+    ui->output_ogl->updateImage(outputImage.imageTransfer());
 
 
 
@@ -140,5 +141,5 @@ void MainWindow::on_std_dev_y_dsb_valueChanged(double v) {
 }
 
 void MainWindow::on_swag_btn_pressed() {
-    putSomeSwagOnThem();
+    processInputImage();
 }

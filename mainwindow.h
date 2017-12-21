@@ -22,7 +22,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void putSomeSwagOnThem();
+    void processInputImage();
 
 protected slots:
     void on_actionSave_triggered();
@@ -40,7 +40,7 @@ private:
     QString m_open_file_name;
 
     size_t m_kernel_size = 3;
-    double m_std_dev_x = 5;
+    double m_std_dev_x = 25;
     double m_std_dev_y = 5;
 
     void fixSizes();
